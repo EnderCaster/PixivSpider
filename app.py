@@ -2,7 +2,6 @@
 #-*- coding:utf8 -*-
 import requests as req
 import time
-from SETTINGS import SETTINGS
 from AimImages import AimImages
 from random import random
 import argparse
