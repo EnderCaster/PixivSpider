@@ -28,27 +28,29 @@ while resp:
         break
     # need refer header when download curl -e 'https://www.pixiv.net/'
     for image_profile in data:
-        request_url="https://www.pixiv.net/ajax/illust/"+image_profile['illustId']+"/pages"
-        resp_image_post=req.get(request_url,headers=headers)
-        illust_json=json.loads(resp_image_post.text)
-        illusts=[]
-        if not illust_json['error']:
-            illusts=illust_json['body']
-        if len(data) <= 0:
-            break
-        for illust in illusts:
-            print(illusts)
-            image=AimImages(keyword=parse.unquote(keyword))
-            image.id=image_profile['id']
-            image.title=image_profile['illustTitle']
-            image.source="https://www.pixiv.net/artworks/"+image_profile['id']
-            image.tags="    ".join(image_profile['tags'])
-            image.author=image_profile['userName']
-            image.author_id=image_profile['userId']
-            image.url=illust['urls']['original']
-            image.save()
-        # time.sleep(SETTINGS.DELAY_BASE+3*random())
-        exit()
+        try:
+            request_url="https://www.pixiv.net/ajax/illust/"+image_profile['illustId']+"/pages"
+            resp_image_post=req.get(request_url,headers=headers)
+            illust_json=json.loads(resp_image_post.text)
+            illusts=[]
+            if not illust_json['error']:
+                illusts=illust_json['body']
+            if len(data) <= 0:
+                break
+            for illust in illusts:
+                image=AimImages(keyword=parse.unquote(keyword))
+                image.id=image_profile['id']
+                image.title=image_profile['illustTitle']
+                image.source="https://www.pixiv.net/artworks/"+image_profile['id']
+                image.tags="    ".join(image_profile['tags'])
+                image.author=image_profile['userName']
+                image.author_id=image_profile['userId']
+                image.url=illust['urls']['original']
+                image.save()
+        except Exception as e:
+            with open('Exception.log','a',encoding='utf-8') as f:
+                f.write("Exception:"+str(e)+"\n")
+                f.write("image_profile:"+str(image_profile)+"\n")
         
     index_count+=1
     page=index_count

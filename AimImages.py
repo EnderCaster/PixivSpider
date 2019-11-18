@@ -18,16 +18,16 @@ class AimImages:
         line.append(self.title)
         line.append(self.source)
         line.append(self.tags)
-        line.append(self.author)
         line.append(self.author_id)
+        line.append(self.author)
         line.append(self.url)
         file_name=self.url_file_name+self.url_file_extension
 
         import os
         if not os.path.exists(file_name):
-            with open(file_name,'w') as f:
+            with open(file_name,'w',encoding='utf-8') as f:
                 f.write(",".join(self.table_header)+"\n")
 
-        with open(file_name,"a") as record:
+        with open(file_name,"a",encoding='utf-8') as record:
             record.write(",".join(line)+"\n")
     
