@@ -26,8 +26,20 @@ class AimImages:
         import os
         if not os.path.exists(file_name):
             with open(file_name,'w',encoding='utf-8') as f:
-                f.write(",".join(self.table_header)+"\n")
+                f.write("\t".join(self.table_header)+"\n")
 
         with open(file_name,"a",encoding='utf-8') as record:
-            record.write(",".join(line)+"\n")
-    
+            record.write("\t".join(line)+"\n")
+    def load(self,line):
+        line=line.strip()
+        if len(line)<=0:
+            self.url=''
+            return 
+        params=line.split("\t")
+        self.id=params[0]
+        self.title=params[1]
+        self.source=params[2]
+        self.tags=params[3]
+        self.author_id=params[4]
+        self.author=params[5]
+        self.url=params[6]

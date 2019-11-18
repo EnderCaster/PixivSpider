@@ -10,6 +10,14 @@ This repo is build from [GelbooruSpider](https://github.com/EnderCaster/Gelbooru
 ```bash
     python app.py keyword
 ```
+```bash
+    # if you wanna to unique the url
+    python resolve_exists.py csv_file
+    # and then it will resolve image infomation from csv_file.csv
+    # or
+    python resolve_exists.py 'csv file'
+    # and then it will resolve image infomation from csv file.csv
+```
 ## example
 ```bash
     python app.py honkai_impact_3rd
