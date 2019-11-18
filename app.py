@@ -15,7 +15,7 @@ arg_parser=argparse.ArgumentParser()
 arg_parser.add_argument('keyword')
 arg_parser.add_argument("--min-width",default=0,help="The minium width of the image")
 arg_parser.add_argument("--min-height",default=0,help="The minium height of the image")
-arg_parser.add_argument("--ratio",dest="WIDTH:HEIGHT",help="What ratio of the image you want")
+arg_parser.add_argument("--ratio",help="WIDTH:HEIGHT What ratio of the image you want")
 arg_parser.add_argument("--start-page",default=0,help="start page")
 
 args=arg_parser.parse_args()
@@ -38,7 +38,7 @@ with open(exists_file_name,'r') as f:
 start_url="https://www.pixiv.net/ajax/search/artworks/"+keyword+"?word="+keyword
 headers={"Connection":"close"}
 resp=req.get(start_url)
-index_count=args.start_page
+index_count=int(args.start_page)
 
 temp=0
 while resp:
