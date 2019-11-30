@@ -11,6 +11,10 @@ This repo is build from [GelbooruSpider](https://github.com/EnderCaster/Gelbooru
     python app.py keyword
 ```
 ```bash
+    # if you wanna to get R-18/R-18G please login and set the profile
+    # then get your cookies,x-user-id in the F12 panel (network,xhr request)
+    cp .Settings.py Settings.py
+    # then paste it into Settings.py
     # if you wanna to unique the url
     python resolve_exists.py csv_file
     # and then it will resolve image infomation from csv_file.csv

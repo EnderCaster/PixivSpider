@@ -10,6 +10,7 @@ import json
 from Log import log
 from Log import exception
 import os
+from Settings import *
 
 arg_parser=argparse.ArgumentParser()
 arg_parser.add_argument('keyword')
@@ -35,14 +36,32 @@ with open(exists_file_name,'r') as f:
     
 
 
-start_url="https://www.pixiv.net/ajax/search/artworks/"+keyword+"?word="+keyword
-headers={"Connection":"close"}
-resp=req.get(start_url)
+base_url="https://www.pixiv.net/ajax/search/artworks/"+keyword+"?word="+keyword
+headers={
+    "Connection":"close",
+    "user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36",
+    "x-user-id":HEADER_USER_ID,
+    "cookie":HEADER_COOKIES,
+    "referer":"https://www.pixiv.net/tags/"+keyword+"/artworks?s_mode=s_tag",
+    'authority':'www.pixiv.net',
+    'pragma':'no-cache',
+    'cache-control': 'no-cache',
+    'accept': 'application/json',
+    'dnt': '1',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-mode': 'cors',
+    'accept-encoding': 'gzip, deflate, br'
+    }
 index_count=int(args.start_page)
+start_url=base_url
+if(index_count>0):
+    start_url=start_url+"&p="+str(index_count-1)
+resp=req.get(base_url,headers=headers)
 
 temp=0
 while resp:
-    log('Now,parsing page '+str(index_count+1))
+    page=index_count+1
+    log('Now,parsing page '+str(page))
     resp_json=json.loads(resp.text)
     data=[]
     if not resp_json['error']:
@@ -87,11 +106,10 @@ while resp:
             exception("Exception:"+str(e))
             exception("image_profile:"+str(image_profile)+"\n")
         except KeyboardInterrupt as ki:
-            log(str(index_count+1),'EndAt')
+            log(str(page),'EndAt.txt')
             exit()
         
-    index_count+=1
-    page=index_count
-    next_url=start_url+"&p="+str(page)
+    index_count=page
+    next_url=base_url+"&p="+str(page+1)
 
-    resp=req.get(next_url)
+    resp=req.get(next_url,headers=headers)
