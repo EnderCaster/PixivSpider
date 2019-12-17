@@ -21,10 +21,11 @@ arg_parser.add_argument("--start-page",default=0,help="start page")
 
 args=arg_parser.parse_args()
 keyword=parse.quote(args.keyword)
-exists_file_name='already_exists.txt'
+exists_file_name=parse.unquote(keyword)+'-already_exists_ids.txt'
+url_file_name=parse.unquote(keyword)+'-already_exists.txt'
 already_exists=[]
 if not os.path.exists(exists_file_name):
-    log('file created',exists_file_name)
+    log('parsing start',exists_file_name)
 
 with open(exists_file_name,'r') as f:
     line=f.readline().strip()
@@ -34,7 +35,6 @@ with open(exists_file_name,'r') as f:
         line=f.readline().strip()
     
     
-
 
 base_url="https://www.pixiv.net/ajax/search/artworks/"+keyword+"?word="+keyword
 headers={
@@ -71,6 +71,10 @@ while resp:
     # need refer header when download curl -e 'https://www.pixiv.net/'
     for image_profile in data:
         try:
+            if image_profile['id'] in already_exists:
+                continue
+            if len(data) <= 0:
+                break
             if args.min_height and args.min_height > image_profile['height']:
                 continue
             if args.min_width and args.min_width > image_profile['width']:
@@ -86,11 +90,8 @@ while resp:
             illusts=[]
             if not illust_json['error']:
                 illusts=illust_json['body']
-            if len(data) <= 0:
-                break
+            
             for illust in illusts:
-                if illust['urls']['original'] in already_exists:
-                    continue
                 image=AimImages(keyword=parse.unquote(keyword))
                 image.id=image_profile['id']
                 image.title=image_profile['illustTitle']
@@ -100,11 +101,16 @@ while resp:
                 image.author_id=image_profile['userId']
                 image.url=illust['urls']['original']
                 image.save()
-                already_exists.append(illust['urls']['original'])
-                log(illust['urls']['original'],file=exists_file_name,echo=False)
+                log(illust['urls']['original'] ,file=url_file_name,echo=False)
+                
+            already_exists.append(image_profile['id'])
+            log(image_profile['id'] ,file=exists_file_name,echo=False)
         except Exception as e:
             exception("Exception:"+str(e))
-            exception("image_profile:"+str(image_profile)+"\n")
+            if "id" in image_profile.keys():
+                log(str(image_profile),parse.unquote(keyword)+'-failed_images.txt')
+            else:
+                exception("image_profile:"+str(image_profile))
         except KeyboardInterrupt as ki:
             log(str(page),'EndAt.txt')
             exit()
