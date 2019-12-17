@@ -36,6 +36,8 @@ class AimImages:
             self.url=''
             return 
         params=line.split("\t")
+        if len(params)<7:
+            return
         self.id=params[0]
         self.title=params[1]
         self.source=params[2]
