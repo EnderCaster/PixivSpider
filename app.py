@@ -57,7 +57,6 @@ start_url=base_url
 if(index_count>0):
     start_url=start_url+"&p="+str(index_count-1)
 resp=req.get(base_url,headers=headers)
-
 temp=0
 while resp:
     page=index_count+1
@@ -83,8 +82,8 @@ while resp:
                 width,height=args.ratio.split(':')
                 if width*image_profile['height'] != height*image_profile['width']:
                     continue
-            request_url="https://www.pixiv.net/ajax/illust/"+image_profile['illustId']+"/pages"
-            log('Now,parsing illust: '+image_profile['illustId']+'-'+image_profile['illustTitle'])
+            request_url="https://www.pixiv.net/ajax/illust/"+image_profile['id']+"/pages"
+            log('Now,parsing illust: '+image_profile['id']+'-'+image_profile['title'])
             resp_image_post=req.get(request_url,headers=headers)
             illust_json=json.loads(resp_image_post.text)
             illusts=[]
@@ -94,7 +93,7 @@ while resp:
             for illust in illusts:
                 image=AimImages(keyword=parse.unquote(keyword))
                 image.id=image_profile['id']
-                image.title=image_profile['illustTitle']
+                image.title=image_profile['title']
                 image.source="https://www.pixiv.net/artworks/"+image_profile['id']
                 image.tags=",".join(image_profile['tags'])
                 image.author=image_profile['userName']
