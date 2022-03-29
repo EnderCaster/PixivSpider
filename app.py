@@ -10,7 +10,9 @@ import json
 from Log import log
 from Log import exception
 import os
+
 from Settings import *
+from download_util import *
 
 arg_parser=argparse.ArgumentParser()
 arg_parser.add_argument('keyword')
@@ -18,11 +20,15 @@ arg_parser.add_argument("--min-width",default=0,help="The minium width of the im
 arg_parser.add_argument("--min-height",default=0,help="The minium height of the image")
 arg_parser.add_argument("--ratio",help="WIDTH:HEIGHT What ratio of the image you want")
 arg_parser.add_argument("--start-page",default=0,help="start page")
+arg_parser.add_argument("--download",default=False,help="download")
+arg_parser.add_argument("--dir",default="./",help="download base dir, use with --download")
 
 args=arg_parser.parse_args()
 keyword=parse.quote(args.keyword)
 exists_file_name=parse.unquote(keyword)+'-already_exists_ids.txt'
 url_file_name=parse.unquote(keyword)+'-already_exists.txt'
+download_dir=os.path.abspath(args.dir)
+
 already_exists=[]
 if not os.path.exists(exists_file_name):
     log('parsing start',exists_file_name)
@@ -100,8 +106,15 @@ while resp:
                 image.author=image_profile['userName']
                 image.author_id=image_profile['userId']
                 image.url=illust['urls']['original']
+                if not image.url.find("ugoira") == -1:
+                    ugoira_resp = req.get(
+                        "https://www.pixiv.net/ajax/illust/{}/ugoira_meta".format(image_profile['id']), headers=headers)
+                    ugoira_json = ugoira_resp.json()
+                    image.url=ugoira_json["body"]["originalSrc"]
                 image.save()
-                log(illust['urls']['original'] ,file=url_file_name,echo=False)
+                if args.download:
+                    download_directly(image.url,download_dir)
+                log(image.url ,file=url_file_name,echo=False)
                 
             already_exists.append(image_profile['id'])
             log(image_profile['id'] ,file=exists_file_name,echo=False)
